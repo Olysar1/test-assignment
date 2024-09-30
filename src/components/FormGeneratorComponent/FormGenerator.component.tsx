@@ -1,9 +1,9 @@
 import { ChangeEvent, FC, FormEvent, useState } from "react";
-import { IFormValues, Props } from "./FormGenerator.types";
+import { IFormGeneratorValues, Props } from "./FormGenerator.types";
 import { transformFormGeneratorFields } from "../../utils/transformFormGeneratorFields";
 import { useFormFields } from "../../context/FormFieldsContext/FormFieldsContext";
 
-const formDefaultValues: IFormValues = {
+const formDefaultValues: IFormGeneratorValues = {
   inputType: "text",
   inputLabel: "",
   selectFieldOptions: [],

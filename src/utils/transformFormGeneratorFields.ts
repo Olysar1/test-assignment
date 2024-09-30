@@ -1,8 +1,8 @@
-import { IFormValues } from "../components/FormGeneratorComponent/FormGenerator.types";
+import { IFormGeneratorValues } from "../components/FormGeneratorComponent/FormGenerator.types";
 
 export const transformFormGeneratorFields = (
-  formValues: IFormValues
-): IFormValues => {
+  formValues: IFormGeneratorValues
+): IFormGeneratorValues => {
   return {
     ...formValues,
     ...(formValues.inputType === "select"

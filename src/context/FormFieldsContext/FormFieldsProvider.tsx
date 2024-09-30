@@ -1,9 +1,9 @@
 import { ReactNode, useState } from "react";
-import { IFormValues } from "../../components/FormGeneratorComponent/FormGenerator.types";
+import { IFormGeneratorValues } from "../../components/FormGeneratorComponent/FormGenerator.types";
 import { FormFieldsContext } from "./FormFieldsContext";
 
 export const FormFieldsProvider = ({ children }: { children: ReactNode }) => {
-  const [formFields, setFormFields] = useState<IFormValues[]>([]);
+  const [formFields, setFormFields] = useState<IFormGeneratorValues[]>([]);
 
   return (
     <FormFieldsContext.Provider value={{ formFields, setFormFields }}>
