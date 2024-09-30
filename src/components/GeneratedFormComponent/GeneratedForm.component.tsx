@@ -1,10 +1,11 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useFormFields } from "../../context/FormFieldsContext/FormFieldsContext";
 import { toCamelCase } from "../../utils/toCamelCase";
+import { IGeneratedFormValues } from "./GeneratedForm.types";
 
 const GeneratedForm = () => {
   const { formFields } = useFormFields();
-  const [formValues, setFormValues] = useState({});
+  const [formValues, setFormValues] = useState<IGeneratedFormValues>({});
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -41,7 +42,7 @@ const GeneratedForm = () => {
                 {field.inputType === "select" ? (
                   <select
                     name={fieldName}
-                    value={formValues[fieldName]}
+                    value={formValues[fieldName] as string}
                     onChange={handleChange}
                     className="input-base"
                   >
@@ -53,7 +54,10 @@ const GeneratedForm = () => {
                   <input
                     type={field.inputType}
                     name={fieldName}
-                    value={formValues[fieldName]}
+                    // value={formValues[fieldName]}
+                    {...(field.inputType === "checkbox"
+                      ? { checked: formValues[fieldName] as boolean }
+                      : { value: formValues[fieldName] as string })}
                     onChange={handleChange}
                     className="input-base"
                   />
