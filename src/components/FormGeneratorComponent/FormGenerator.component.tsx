@@ -1,6 +1,7 @@
 import { ChangeEvent, FC, FormEvent, useState } from "react";
 import { IFormValues, Props } from "./FormGenerator.types";
 import { transformFormGeneratorFields } from "../../utils/transformFormGeneratorFields";
+import { useFormFields } from "../../context/FormFieldsContext/FormFieldsContext";
 
 const formDefaultValues: IFormValues = {
   inputType: "text",
@@ -11,6 +12,7 @@ const formDefaultValues: IFormValues = {
 const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
   const [formValues, setFormValues] = useState(formDefaultValues);
   const [newOption, setNewOption] = useState("");
+  const { setFormFields } = useFormFields();
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -40,7 +42,6 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
   };
 
   const handleRemoveOption = (option: string) => {
-    console.log(option);
     setFormValues((prev) => ({
       ...prev,
       selectFieldOptions: prev.selectFieldOptions.filter(
@@ -51,8 +52,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form Submitted:", transformFormGeneratorFields(formValues));
+    const cleanFormFieldObject = transformFormGeneratorFields(formValues);
 
+    setFormFields((prev) => [...prev, cleanFormFieldObject]);
     setFormValues(formDefaultValues);
   };
 

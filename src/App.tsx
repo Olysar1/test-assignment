@@ -6,7 +6,7 @@ const options = ["text", "checkbox", "select"];
 
 function App() {
   return (
-    <div className="flex justify-around">
+    <div className="flex justify-around gap-[5%]">
       <FormGenerator inputTypeOptions={options} />
       <GeneratedForm />
     </div>
