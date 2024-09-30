@@ -7,6 +7,9 @@ const formDefaultValues: IFormGeneratorValues = {
   inputType: "text",
   inputLabel: "",
   selectFieldOptions: [],
+  hasConditionalLogic: false,
+  relativeElementLabel: "",
+  valueToTrack: "",
 };
 
 const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
@@ -17,11 +20,11 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target as HTMLInputElement;
 
     setFormValues((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
     setNewOption("");
   };
@@ -139,6 +142,49 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
             className="input-base"
           />
         </div>
+        <div className="form-field-layout">
+          <label htmlFor="inputLabel" className="input-label-base">
+            Has conditional logic
+          </label>
+          <input
+            type="checkbox"
+            name="hasConditionalLogic"
+            checked={formValues.hasConditionalLogic}
+            onChange={handleChange}
+            className="input-base"
+          />
+        </div>
+        {formValues.hasConditionalLogic && (
+          <div className="form-field-outline">
+            <div className="form-field-layout">
+              <label
+                htmlFor="relativeElementLabel"
+                className="input-label-base"
+              >
+                Relative Element Label
+              </label>
+              <input
+                type="text"
+                name="relativeElementLabel"
+                value={formValues.relativeElementLabel}
+                onChange={handleChange}
+                className="input-base"
+              />
+            </div>
+            <div className="form-field-layout">
+              <label htmlFor="valueToTrack" className="input-label-base">
+                Value to track
+              </label>
+              <input
+                type="text"
+                name="valueToTrack"
+                value={formValues.valueToTrack}
+                onChange={handleChange}
+                className="input-base"
+              />
+            </div>
+          </div>
+        )}
         <button className="btn-primary">+ Add Field</button>
       </form>
     </div>
