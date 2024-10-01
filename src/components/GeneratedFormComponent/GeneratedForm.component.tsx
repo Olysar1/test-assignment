@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { useFormFields } from "../../context/FormFieldsContext/FormFieldsContext";
 import { toCamelCase } from "../../utils/toCamelCase";
 import { IGeneratedFormValues } from "./GeneratedForm.types";
@@ -7,6 +7,17 @@ const GeneratedForm = () => {
   const { formFields } = useFormFields();
   const [formValues, setFormValues] = useState<IGeneratedFormValues>({});
   const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    const initialFormValues: IGeneratedFormValues = {};
+    formFields.forEach((field) => {
+      const fieldName = toCamelCase(field.inputLabel);
+      if (field.inputType === "select" && field.selectFieldOptions.length > 0) {
+        initialFormValues[fieldName] = field.selectFieldOptions[0];
+      }
+    });
+    setFormValues(initialFormValues);
+  }, [formFields]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -79,6 +90,7 @@ const GeneratedForm = () => {
                     onChange={handleChange}
                     className="input-base"
                   >
+                    <option disabled>select an option</option>
                     {field.selectFieldOptions.map((option) => {
                       return <option key={option}>{option}</option>;
                     })}

@@ -161,7 +161,7 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
                 htmlFor="relativeElementLabel"
                 className="input-label-base"
               >
-                Relative Element Label
+                Relative element label
               </label>
               <input
                 type="text"
