@@ -31,7 +31,7 @@
 }
 
 .input-label-error {
-  @apply text-red-500;
+  @apply text-red-400;
 }
 
 .input-base {
@@ -39,5 +39,5 @@
 }
 
 .input-error {
-  @apply border-red-600;
+  @apply border-red-400;
 }

@@ -1,7 +1,13 @@
 import { ChangeEvent, FC, FormEvent, useState } from "react";
-import { IFormGeneratorValues, Props } from "./FormGenerator.types";
+import {
+  FormGeneratorErrors,
+  IFormGeneratorValues,
+  Props,
+} from "./FormGenerator.types";
 import { transformFormGeneratorFields } from "../../utils/transformFormGeneratorFields";
 import { useFormFields } from "../../context/FormFieldsContext/FormFieldsContext";
+import { formSchema } from "./FormGenerator.schema";
+import { ValidationError } from "yup";
 
 const formDefaultValues: IFormGeneratorValues = {
   inputType: "text",
@@ -13,11 +19,24 @@ const formDefaultValues: IFormGeneratorValues = {
 };
 
 const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
+  const [errors, setErrors] = useState<FormGeneratorErrors>({});
   const [formValues, setFormValues] = useState(formDefaultValues);
   const [newOption, setNewOption] = useState("");
   const { setFormFields } = useFormFields();
 
-  const handleChange = (
+  // const handleChange = (
+  //   e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  // ) => {
+  //   const { name, value, type, checked } = e.target as HTMLInputElement;
+
+  //   setFormValues((prev) => ({
+  //     ...prev,
+  //     [name]: type === "checkbox" ? checked : value,
+  //   }));
+  //   setNewOption("");
+  // };
+
+  const handleChange = async (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value, type, checked } = e.target as HTMLInputElement;
@@ -26,7 +45,21 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-    setNewOption("");
+
+    try {
+      await formSchema.validateAt(name, { ...formValues, [name]: value });
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: undefined,
+      }));
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: error.message,
+        }));
+      }
+    }
   };
 
   const handleAddOption = () => {
@@ -53,12 +86,30 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
     }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const cleanFormFieldObject = transformFormGeneratorFields(formValues);
 
-    setFormFields((prev) => [...prev, cleanFormFieldObject]);
-    setFormValues(formDefaultValues);
+    try {
+      const validFormData = await formSchema.validate(formValues, {
+        abortEarly: false,
+      });
+
+      const cleanFormFieldObject = transformFormGeneratorFields(validFormData);
+
+      setFormFields((prev) => [...prev, cleanFormFieldObject]);
+      setFormValues(formDefaultValues);
+      setErrors({});
+    } catch (validationErrors) {
+      if (validationErrors instanceof ValidationError) {
+        const formattedErrors: Record<string, string> = {};
+        validationErrors.inner.forEach((error) => {
+          if (error.path) {
+            formattedErrors[error.path] = error.message;
+          }
+        });
+        setErrors(formattedErrors);
+      }
+    }
   };
 
   return (
@@ -69,14 +120,19 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
         onSubmit={handleSubmit}
       >
         <div className="form-field-layout">
-          <label htmlFor="inputType" className="input-label-base">
+          <label
+            htmlFor="inputType"
+            className={`input-label-base ${
+              errors.inputType ? "label-error" : ""
+            }`}
+          >
             Select input type
           </label>
           <select
             name="inputType"
             value={formValues.inputType}
             onChange={handleChange}
-            className="input-base"
+            className={`input-base ${errors.inputType ? "input-error" : ""}`}
           >
             {inputTypeOptions.map((option) => {
               return <option key={option}>{option}</option>;
@@ -87,7 +143,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
           <div className="form-field-layout form-field-outline">
             <label
               htmlFor="selectFieldOptions"
-              className="input-label-secondary"
+              className={`input-label-secondary ${
+                errors.selectFieldOptions ? "label-error" : ""
+              }`}
             >
               Input select field options
             </label>
@@ -95,7 +153,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
               type="text"
               value={newOption}
               onChange={(e) => setNewOption(e.target.value)}
-              className="input-base mb-2"
+              className={`input-base mb-2 ${
+                errors.selectFieldOptions ? "input-error" : ""
+              }`}
             />
             {formValues.selectFieldOptions.length > 0 && (
               <ul className="form-field-outline flex flex-col gap-1 mb-2 text-slate-500">
@@ -131,7 +191,12 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
           </div>
         )}
         <div className="form-field-layout">
-          <label htmlFor="inputLabel" className="input-label-base">
+          <label
+            htmlFor="inputLabel"
+            className={`input-label-base ${
+              errors.inputLabel ? "input-label-error" : ""
+            }`}
+          >
             Input field label
           </label>
           <input
@@ -139,11 +204,16 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
             name="inputLabel"
             value={formValues.inputLabel}
             onChange={handleChange}
-            className="input-base"
+            className={`input-base ${errors.inputLabel ? "input-error" : ""}`}
           />
         </div>
         <div className="form-field-layout">
-          <label htmlFor="inputLabel" className="input-label-base">
+          <label
+            htmlFor="hasConditionalLogic"
+            className={`input-label-base ${
+              errors.hasConditionalLogic ? "label-error" : ""
+            }`}
+          >
             Has conditional logic
           </label>
           <input
@@ -151,7 +221,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
             name="hasConditionalLogic"
             checked={formValues.hasConditionalLogic}
             onChange={handleChange}
-            className="input-base"
+            className={`input-base ${
+              errors.hasConditionalLogic ? "input-error" : ""
+            }`}
           />
         </div>
         {formValues.hasConditionalLogic && (
@@ -159,7 +231,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
             <div className="form-field-layout">
               <label
                 htmlFor="relativeElementLabel"
-                className="input-label-base"
+                className={`input-label-base ${
+                  errors.relativeElementLabel ? "label-error" : ""
+                }`}
               >
                 Relative element label
               </label>
@@ -168,11 +242,18 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
                 name="relativeElementLabel"
                 value={formValues.relativeElementLabel}
                 onChange={handleChange}
-                className="input-base"
+                className={`input-base ${
+                  errors.relativeElementLabel ? "input-error" : ""
+                }`}
               />
             </div>
             <div className="form-field-layout">
-              <label htmlFor="valueToTrack" className="input-label-base">
+              <label
+                htmlFor="valueToTrack"
+                className={`input-label-base ${
+                  errors.valueToTrack ? "label-error" : ""
+                }`}
+              >
                 Value to track
               </label>
               <input
@@ -180,7 +261,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
                 name="valueToTrack"
                 value={formValues.valueToTrack}
                 onChange={handleChange}
-                className="input-base"
+                className={`input-base ${
+                  errors.valueToTrack ? "input-error" : ""
+                }`}
               />
             </div>
           </div>
