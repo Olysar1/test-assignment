@@ -1,5 +1,8 @@
 The form generator:
 
+-run "npm install" to install dependencies
+-run "npm run dev" to start a project
+
 The form generator lets us generate form with input fields of type "text", "checkbox" and "select".
 
 To add a simple field to the generated form we can fill "Select input type" and "Input field label" fields and click on "add field" button.
