@@ -65,22 +65,24 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
   const handleAddOption = () => {
     if (
       newOption.trim() === "" ||
-      formValues.selectFieldOptions.some((val) => val === newOption) //prevent duplicates
+      formValues.selectFieldOptions?.some((val) => val === newOption) //prevent duplicates
     ) {
       return;
     }
 
     setFormValues((prev) => ({
       ...prev,
-      selectFieldOptions: [...prev.selectFieldOptions, newOption], //here we could use uuid to generate unique ID for each option
+      ...(prev.selectFieldOptions && {
+        selectFieldOptions: [...prev.selectFieldOptions, newOption],
+      }), //here we could use uuid to generate unique ID for each option
     }));
     setNewOption("");
   };
 
-  const handleRemoveOption = (option: string) => {
+  const handleRemoveOption = (option: string | undefined) => {
     setFormValues((prev) => ({
       ...prev,
-      selectFieldOptions: prev.selectFieldOptions.filter(
+      selectFieldOptions: prev.selectFieldOptions?.filter(
         (val) => option !== val
       ),
     }));
@@ -157,28 +159,29 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
                 errors.selectFieldOptions ? "input-error" : ""
               }`}
             />
-            {formValues.selectFieldOptions.length > 0 && (
-              <ul className="form-field-outline flex flex-col gap-1 mb-2 text-slate-500">
-                {formValues.selectFieldOptions.map((fieldOption) => (
-                  <li
-                    key={fieldOption}
-                    className="border border-slate-200 py-1 px-2 rounded-xl flex items-center justify-between"
-                  >
-                    <span>{fieldOption}</span>
-                    <button
-                      type="button"
-                      className="btn-delete"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleRemoveOption(fieldOption);
-                      }}
+            {formValues.selectFieldOptions &&
+              formValues.selectFieldOptions.length > 0 && (
+                <ul className="form-field-outline flex flex-col gap-1 mb-2 text-slate-500">
+                  {formValues.selectFieldOptions.map((fieldOption) => (
+                    <li
+                      key={fieldOption}
+                      className="border border-slate-200 py-1 px-2 rounded-xl flex items-center justify-between"
                     >
-                      Remove option
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+                      <span>{fieldOption}</span>
+                      <button
+                        type="button"
+                        className="btn-delete"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleRemoveOption(fieldOption);
+                        }}
+                      >
+                        Remove option
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             <button
               onClick={(e) => {
                 e.preventDefault();

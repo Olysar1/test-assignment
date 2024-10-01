@@ -9,10 +9,10 @@ export type Props = {
 export interface IFormGeneratorValues {
   inputType: string;
   inputLabel: string;
-  selectFieldOptions: string[];
-  hasConditionalLogic: boolean;
-  relativeElementLabel: string;
-  valueToTrack: string;
+  selectFieldOptions?: (string | undefined)[] | undefined;
+  hasConditionalLogic?: boolean | undefined;
+  relativeElementLabel?: string | undefined;
+  valueToTrack?: string | undefined;
 }
 
 export type FormGeneratorErrors = Partial<Stringify<IFormGeneratorValues>>;
