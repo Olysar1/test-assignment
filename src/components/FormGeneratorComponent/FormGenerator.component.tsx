@@ -11,7 +11,7 @@ import { ValidationError } from "yup";
 import { isDuplicateKey } from "../../utils/isDuplicateKey";
 import { noGeneratedField } from "../../utils/noGeneratedField";
 
-const formDefaultValues: IFormGeneratorValues = {
+const formDefaultValues = {
   inputType: "text",
   inputLabel: "",
   selectFieldOptions: [],
@@ -22,8 +22,9 @@ const formDefaultValues: IFormGeneratorValues = {
 
 const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
   const [errors, setErrors] = useState<FormGeneratorErrors>({});
-  const [formValues, setFormValues] = useState(formDefaultValues);
-  const [newOption, setNewOption] = useState("");
+  const [formValues, setFormValues] =
+    useState<IFormGeneratorValues>(formDefaultValues);
+  const [newOption, setNewOption] = useState<string>("");
   const { formFields, formKeys, setFormFields } = useFormFields();
 
   const handleChange = async (
