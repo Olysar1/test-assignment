@@ -89,8 +89,21 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
       });
 
       const cleanFormFieldObject = transformFormGeneratorFields(validFormData);
+
       if (formKeys.includes(toCamelCase(cleanFormFieldObject.inputLabel))) {
         setErrors({ inputLabel: "Cannot have two fields with the same name" });
+        throw new Error();
+      }
+
+      if (
+        cleanFormFieldObject.relativeElementLabel &&
+        !formKeys.includes(
+          toCamelCase(cleanFormFieldObject.relativeElementLabel)
+        )
+      ) {
+        setErrors({
+          relativeElementLabel: "There is no generated field with this name",
+        });
         throw new Error();
       }
 
@@ -109,9 +122,6 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
       }
     }
   };
-
-  console.log(formValues);
-  console.log(errors);
 
   return (
     <div className="w-1/2 flex flex-col items-center gap-5">
@@ -139,7 +149,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
               return <option key={option}>{option}</option>;
             })}
           </select>
-          {errors.inputType && <span className="error-text">{errors.inputType}</span>}
+          {errors.inputType && (
+            <span className="error-text">{errors.inputType}</span>
+          )}
         </div>
         {formValues.inputType === "select" && (
           <div className="form-field-layout form-field-outline">
@@ -212,7 +224,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
             onChange={handleChange}
             className={`input-base ${errors.inputLabel ? "input-error" : ""}`}
           />
-          {errors.inputLabel && <span className="error-text">{errors.inputLabel}</span>}
+          {errors.inputLabel && (
+            <span className="error-text">{errors.inputLabel}</span>
+          )}
         </div>
         {formFields.length > 0 && (
           <div className="form-field-layout">
@@ -259,7 +273,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
                 }`}
               />
               {errors.relativeElementLabel && (
-                <span className="error-text">{errors.relativeElementLabel}</span>
+                <span className="error-text">
+                  {errors.relativeElementLabel}
+                </span>
               )}
             </div>
             <div className="form-field-layout">
@@ -280,7 +296,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
                   errors.valueToTrack ? "input-error" : ""
                 }`}
               />
-              {errors.valueToTrack && <span className="error-text">{errors.valueToTrack}</span>}
+              {errors.valueToTrack && (
+                <span className="error-text">{errors.valueToTrack}</span>
+              )}
             </div>
           </div>
         )}
