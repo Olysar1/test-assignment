@@ -22,19 +22,7 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
   const [errors, setErrors] = useState<FormGeneratorErrors>({});
   const [formValues, setFormValues] = useState(formDefaultValues);
   const [newOption, setNewOption] = useState("");
-  const { setFormFields } = useFormFields();
-
-  // const handleChange = (
-  //   e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  // ) => {
-  //   const { name, value, type, checked } = e.target as HTMLInputElement;
-
-  //   setFormValues((prev) => ({
-  //     ...prev,
-  //     [name]: type === "checkbox" ? checked : value,
-  //   }));
-  //   setNewOption("");
-  // };
+  const { formFields, setFormFields } = useFormFields();
 
   const handleChange = async (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -210,25 +198,27 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
             className={`input-base ${errors.inputLabel ? "input-error" : ""}`}
           />
         </div>
-        <div className="form-field-layout">
-          <label
-            htmlFor="hasConditionalLogic"
-            className={`input-label-base ${
-              errors.hasConditionalLogic ? "label-error" : ""
-            }`}
-          >
-            Has conditional logic
-          </label>
-          <input
-            type="checkbox"
-            name="hasConditionalLogic"
-            checked={formValues.hasConditionalLogic}
-            onChange={handleChange}
-            className={`input-base ${
-              errors.hasConditionalLogic ? "input-error" : ""
-            }`}
-          />
-        </div>
+        {formFields.length > 0 && (
+          <div className="form-field-layout">
+            <label
+              htmlFor="hasConditionalLogic"
+              className={`input-label-base ${
+                errors.hasConditionalLogic ? "label-error" : ""
+              }`}
+            >
+              Has conditional logic
+            </label>
+            <input
+              type="checkbox"
+              name="hasConditionalLogic"
+              checked={formValues.hasConditionalLogic}
+              onChange={handleChange}
+              className={`input-base ${
+                errors.hasConditionalLogic ? "input-error" : ""
+              }`}
+            />
+          </div>
+        )}
         {formValues.hasConditionalLogic && (
           <div className="form-field-outline">
             <div className="form-field-layout">
