@@ -1,14 +1,10 @@
 import "./App.css";
-import { FormGenerator } from "./components/FormGeneratorComponent";
-import { GeneratedForm } from "./components/GeneratedFormComponent";
-
-const options = ["text", "checkbox", "select"];
+import { FormGeneratorPage } from "./pages/FormGeneratorPage";
 
 function App() {
   return (
     <div className="flex justify-around gap-[5%]">
-      <FormGenerator inputTypeOptions={options} />
-      <GeneratedForm />
+      <FormGeneratorPage />
     </div>
   );
 }

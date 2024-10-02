@@ -1,9 +1,11 @@
+import { inputTypes } from "../../common/types/types";
+
 export type Stringify<T> = {
   [K in keyof T]: string;
 };
 
 export type Props = {
-  inputTypeOptions: string[];
+  inputTypeOptions: inputTypes[];
 };
 
 export interface IFormGeneratorValues {
