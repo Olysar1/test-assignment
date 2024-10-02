@@ -8,7 +8,8 @@ import { transformFormGeneratorFields } from "../../utils/transformFormGenerator
 import { useFormFields } from "../../context/FormFieldsContext/FormFieldsContext";
 import { formSchema } from "./FormGenerator.schema";
 import { ValidationError } from "yup";
-import { toCamelCase } from "../../utils/toCamelCase";
+import { isDuplicateKey } from "../../utils/isDuplicateKey";
+import { noGeneratedField } from "../../utils/noGeneratedField";
 
 const formDefaultValues: IFormGeneratorValues = {
   inputType: "text",
@@ -90,16 +91,21 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
 
       const cleanFormFieldObject = transformFormGeneratorFields(validFormData);
 
-      if (formKeys.includes(toCamelCase(cleanFormFieldObject.inputLabel))) {
+      if (
+        isDuplicateKey({
+          generatedFormKeys: formKeys,
+          formGeneratorValues: cleanFormFieldObject,
+        })
+      ) {
         setErrors({ inputLabel: "Cannot have two fields with the same name" });
         throw new Error();
       }
 
       if (
-        cleanFormFieldObject.relativeElementLabel &&
-        !formKeys.includes(
-          toCamelCase(cleanFormFieldObject.relativeElementLabel)
-        )
+        noGeneratedField({
+          generatedFormKeys: formKeys,
+          formGeneratorValues: cleanFormFieldObject,
+        })
       ) {
         setErrors({
           relativeElementLabel: "There is no generated field with this name",
