@@ -8,6 +8,7 @@ import { transformFormGeneratorFields } from "../../utils/transformFormGenerator
 import { useFormFields } from "../../context/FormFieldsContext/FormFieldsContext";
 import { formSchema } from "./FormGenerator.schema";
 import { ValidationError } from "yup";
+import { toCamelCase } from "../../utils/toCamelCase";
 
 const formDefaultValues: IFormGeneratorValues = {
   inputType: "text",
@@ -22,7 +23,7 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
   const [errors, setErrors] = useState<FormGeneratorErrors>({});
   const [formValues, setFormValues] = useState(formDefaultValues);
   const [newOption, setNewOption] = useState("");
-  const { formFields, setFormFields } = useFormFields();
+  const { formFields, formKeys, setFormFields } = useFormFields();
 
   const handleChange = async (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -35,7 +36,10 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
     }));
 
     try {
-      await formSchema.validateAt(name, { ...formValues, [name]: value });
+      if (type === "checkbox")
+        await formSchema.validateAt(name, { ...formValues, [name]: checked });
+      else await formSchema.validateAt(name, { ...formValues, [name]: value });
+
       setErrors((prevErrors) => ({
         ...prevErrors,
         [name]: undefined,
@@ -85,6 +89,10 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
       });
 
       const cleanFormFieldObject = transformFormGeneratorFields(validFormData);
+      if (formKeys.includes(toCamelCase(cleanFormFieldObject.inputLabel))) {
+        setErrors({ inputLabel: "Cannot have two fields with the same name" });
+        throw new Error();
+      }
 
       setFormFields((prev) => [...prev, cleanFormFieldObject]);
       setFormValues(formDefaultValues);
@@ -102,6 +110,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
     }
   };
 
+  console.log(formValues);
+  console.log(errors);
+
   return (
     <div className="w-1/2 flex flex-col items-center gap-5">
       <h1 className="text-3xl font-thin">Form Generator</h1>
@@ -113,7 +124,7 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
           <label
             htmlFor="inputType"
             className={`input-label-base ${
-              errors.inputType ? "label-error" : ""
+              errors.inputType ? "input-label-error" : ""
             }`}
           >
             Select input type
@@ -128,13 +139,14 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
               return <option key={option}>{option}</option>;
             })}
           </select>
+          {errors.inputType && <span className="error-text">{errors.inputType}</span>}
         </div>
         {formValues.inputType === "select" && (
           <div className="form-field-layout form-field-outline">
             <label
               htmlFor="selectFieldOptions"
               className={`input-label-secondary ${
-                errors.selectFieldOptions ? "label-error" : ""
+                errors.selectFieldOptions ? "input-label-error" : ""
               }`}
             >
               Input select field options
@@ -147,6 +159,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
                 errors.selectFieldOptions ? "input-error" : ""
               }`}
             />
+            {errors.selectFieldOptions && (
+              <span className="error-text">{errors.selectFieldOptions}</span>
+            )}
             {formValues.selectFieldOptions &&
               formValues.selectFieldOptions.length > 0 && (
                 <ul className="form-field-outline flex flex-col gap-1 mb-2 text-slate-500">
@@ -155,7 +170,7 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
                       key={fieldOption}
                       className="border border-slate-200 py-1 px-2 rounded-xl flex items-center justify-between"
                     >
-                      <span>{fieldOption}</span>
+                      <span className="error-text">{fieldOption}</span>
                       <button
                         type="button"
                         className="btn-delete"
@@ -197,13 +212,14 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
             onChange={handleChange}
             className={`input-base ${errors.inputLabel ? "input-error" : ""}`}
           />
+          {errors.inputLabel && <span className="error-text">{errors.inputLabel}</span>}
         </div>
         {formFields.length > 0 && (
           <div className="form-field-layout">
             <label
               htmlFor="hasConditionalLogic"
               className={`input-label-base ${
-                errors.hasConditionalLogic ? "label-error" : ""
+                errors.hasConditionalLogic ? "input-label-error" : ""
               }`}
             >
               Has conditional logic
@@ -217,6 +233,9 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
                 errors.hasConditionalLogic ? "input-error" : ""
               }`}
             />
+            {errors.hasConditionalLogic && (
+              <span className="error-text">{errors.hasConditionalLogic}</span>
+            )}
           </div>
         )}
         {formValues.hasConditionalLogic && (
@@ -225,7 +244,7 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
               <label
                 htmlFor="relativeElementLabel"
                 className={`input-label-base ${
-                  errors.relativeElementLabel ? "label-error" : ""
+                  errors.relativeElementLabel ? "input-label-error" : ""
                 }`}
               >
                 Relative element label
@@ -239,12 +258,15 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
                   errors.relativeElementLabel ? "input-error" : ""
                 }`}
               />
+              {errors.relativeElementLabel && (
+                <span className="error-text">{errors.relativeElementLabel}</span>
+              )}
             </div>
             <div className="form-field-layout">
               <label
                 htmlFor="valueToTrack"
                 className={`input-label-base ${
-                  errors.valueToTrack ? "label-error" : ""
+                  errors.valueToTrack ? "input-label-error" : ""
                 }`}
               >
                 Value to track
@@ -258,6 +280,7 @@ const FormGenerator: FC<Props> = ({ inputTypeOptions }) => {
                   errors.valueToTrack ? "input-error" : ""
                 }`}
               />
+              {errors.valueToTrack && <span className="error-text">{errors.valueToTrack}</span>}
             </div>
           </div>
         )}

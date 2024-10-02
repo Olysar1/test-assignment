@@ -3,7 +3,9 @@ import { IFormGeneratorValues } from "../../components/FormGeneratorComponent/Fo
 
 export const FormFieldsContext = createContext<{
   formFields: IFormGeneratorValues[];
+  formKeys: string[];
+  formLabels: string[];
   setFormFields: Dispatch<SetStateAction<IFormGeneratorValues[]>>;
-}>({ formFields: [], setFormFields: () => {} });
+}>({ formFields: [], formKeys: [], formLabels: [], setFormFields: () => {} });
 
 export const useFormFields = () => useContext(FormFieldsContext);

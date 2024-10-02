@@ -11,11 +11,18 @@ export const formSchema = yup.object().shape({
     name: "test for relativeElementLabel",
     message: "Relative element label is required",
     test: (val, { parent: { hasConditionalLogic } }) => {
-      if (hasConditionalLogic === true && !val) return false;
+      if (hasConditionalLogic && !val) return false;
       return true;
     },
   }),
-  valueToTrack: yup.string(),
+  valueToTrack: yup.string().test({
+    name: "test for valueToTrack",
+    message: "Relative element value is required",
+    test: (val, { parent: { hasConditionalLogic } }) => {
+      if (hasConditionalLogic && !val) return false;
+      return true;
+    },
+  }),
   selectFieldOptions: yup
     .array()
     .of(yup.string())

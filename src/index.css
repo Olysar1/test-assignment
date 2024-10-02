@@ -41,3 +41,7 @@
 .input-error {
   @apply border-red-400;
 }
+
+.error-text {
+  @apply text-red-400 text-xs
+}
